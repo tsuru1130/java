@@ -5,6 +5,11 @@ class Main{
 		// Java8~
 		// ラムダ式(lambda expression)
 		// 関数の定義と、その実体の即時生成
+		// funcに代入しているのはcall()をどのようにP(process)O(output)するかの処理ロジック
+		// funcは関数が格納されているメモリ空間を示す変数
+		// 代入する処理ロジックは引数の型と数を合わせれば、処理はどのように書いてもOK
+		// 下の例では(int a, int b)はcall()に合わせないといけないが、処理ブロック{~}の中身は自由に決めてOK!
+		
 		Sub func = ( int a, int b ) -> {
 			return a - b;
 		};
