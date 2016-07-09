@@ -5,10 +5,11 @@ import java.util.Iterator;
 
 public class Main{
 	public static void main( String[] args ){
-		String[] names = new String[3];
+		String[] names = new String[4];
 		names[0] = "たなか";
 		names[1] = "すずき";
 		names[2] = "さいとう";
+		names[2] = "かとう";
 		System.out.println( names[1] );
 		
 		// ArrayListを確保
