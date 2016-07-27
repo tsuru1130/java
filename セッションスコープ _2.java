@@ -61,6 +61,7 @@ public class RegisterUser extends HttpServlet{ // HttpSessionと似てる
 			サーブレットクラスの動作を決定する「action」の値を
 		 		リクエストパラメータから取得
 		 */
+		 // ↓ もし希望したリクエストパラメータがなかった場合はnull
 		String action = request.getParameter( "action" );
 		
 		// 「登録の開始」をリクエストされた時の処理
@@ -72,7 +73,11 @@ public class RegisterUser extends HttpServlet{ // HttpSessionと似てる
 			// 登録確認画面から「登録実行」をリクエストされた時の処理
 			// ↓でsession変数にセッションスコープが格納される。このsessionを使ってセッションを管理する
 			HttpSession session = request.getSession(); // ←のrequestはHttpServletRequestインスタンス
-			// ↑ getSession()でセッションIDを生成するが、二回目のため確認になる
+			// ↑ 2回目のgetSession()では、セッションIDに紐づくユーザーのHttpSessionインスタンスを探す(取得)
+			// もしセッションタイムアウトなどでインスタンスがなければ、新しく作る
+			// ちなみにセッションはあくまでも一時的なものなので、DBと違って、消えてしまうことが前提
+			
+			
 			
 			User registeUser = ( User ) session.getAttribute( "registerUser" );
 			
@@ -113,8 +118,11 @@ public class RegisterUser extends HttpServlet{ // HttpSessionと似てる
 		User registerUser = new User( id, name, pass );
 		
 		// セッションスコープに登録ユーザーを保存
-		// ここが１回目のgetSession()。つまり、ここでセッションIDが生成される
+		// ここが１回目のgetSession()。つまり、ここでセッションIDとセッションスコープ(メモリ空間)が生成される
+		// 時間が経てばセッションタイムアウトで削除される
 		// セッションインスタンスはガベージコレクションの対象外
+		// HttpSessionインスタンスは時間がたったり、ブラウザを閉じれば消える
+		// それに伴ってJavaBeansのインスタンスも消える(セッションスコープ(一時的なもの)上に残しておく必要がないので)
 		HttpSession session = request.getSession();
 		session.setAttribute( "registerUser", registerUser );
 		// ↑でJavaBeansをセッションに登録
@@ -195,6 +203,7 @@ public class User implements Serializable{
 	}
 	
 	// setterの代わりに、コンストラクタで一気に入れる
+	// ここで引数として登録したものは、プロパティとして登録される
 	public User( String id, String name, String pass ){
 		this.id = id;
 		this.name = name;
@@ -225,10 +234,16 @@ public class User implements Serializable{
 
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<%@ page import="model.User" %> // JavaBeansをインポート
+
+// JavaBeansをインポート
+// 必ずスコープから取得するインスタンスのクラスをインポートする
+// クラスはパッケージ入れて、かつパッケージ名も記述する
+<%@ page import="model.User" %> 
 <%
 	// sessionに登録されたJavaBeans(registerUser)をインスタンス化
 	// Object型で登録されているからキャストが必要
+	// session変数はセッションスコープを示す
+	// 下記ではセッションスコープ内にある"registerUser"インスタンスを取得している
 	User registerUser = (User) session.getAttribute( "registerUser" );
 %>
 

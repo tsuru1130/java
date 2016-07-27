@@ -20,6 +20,7 @@
 	【JavaBeans】
 	・jspで受け取る場合は暗黙オブジェクトで受け取る(宣言が必要ない)
 	・Javaクラスの独立性を高める為のインスタンス(HttpServletRequestのインスタンス)
+	・↑HttpServletRequestのインスタンスはスコープのこと(JavaBeansは情報を格納する為だけに作るただのクラス)
 	・関連する情報をひとかたまりにして保持または使い回すことも目的としている
 	・JavaBeans(というインスタンス)を、スコープに保存するとjspで共有ができる
 		→ request.setAttribute("String型", Object型); で登録
@@ -96,13 +97,15 @@ public class HealthCheck extends HttpServlet{
 		String height = request.getParameter( "height" ); // 身長
 		
 		// 入力値をプロパティに設定
-		Health health = new Health(); // importは自動でされる
+		Health health = new Health(); // importは自動でされるHealthCheck
 		health.setHeight( Double.parseDouble( height ) );
 		health.setWeight( Double.parseDouble( weight ) );
 		
 		// 健康診断を実行し、結果を設定
 		HealthCheckLogic healthCheckLogic = new HealthCheckLogic();
-		healthCheckLogic.execute( health );
+		healthCheckLogic.execute( health ); 
+		// ↑でHealth型のデータをインスタンス化しないと、execute( Health health )の引数がhealth型でも受け取れない
+
 		
 		// リクエストスコープに保存
 		request.setAttribute( "health", health );
@@ -201,6 +204,14 @@ import java.io.Serializable;
 public class Health implements Serializable{
 	private double	height, weight, bmi;
 	private String	bodyType;
+	
+	/*
+		コンストラクタでセッターと一緒にやった方がスマートな気がする
+		public Health( double height, double weight ){
+			this.height = height;
+			this.weight = weight;
+			}	
+	*/
 	
 	public double getHeight(){
 		return height;
